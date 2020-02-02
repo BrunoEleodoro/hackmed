@@ -1,6 +1,12 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:hackmed_app/pages/escolher_especialista.dart';
+import 'package:hackmed_app/pages/especialista.dart';
+import 'package:hackmed_app/pages/idade.dart';
 import 'package:hackmed_app/pages/name.dart';
+import 'package:hackmed_app/pages/sentimentos.dart';
 import 'package:speech_recognition/speech_recognition.dart';
 
 void main() => runApp(MyApp());
@@ -11,6 +17,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -21,7 +28,7 @@ class MyApp extends StatelessWidget {
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.green,
       ),
       home: HomePage(),
     );
@@ -43,12 +50,20 @@ class _HomePageState extends State<HomePage> {
   var nome = "";
   Map respostas = new Map();
   var result = "";
+  var text = "";
+  var startListening = false;
+  bool escolherEspecialista = false;
 
-  Future _speak(msg) async {
+  Future<bool> _speak(msg) async {
+    Completer completer = new Completer<bool>();
     await flutterTts.setLanguage("pt-BR");
+    print('call speak');
     var result = await flutterTts.speak(msg);
-    print(result);
-    return true;
+
+    print('finished');
+    completer.complete(true);
+    // print(result);
+    return completer.future;
     // if (result == 1) setState(() => ttsState = TtsState.playing);
   }
 
@@ -60,9 +75,9 @@ class _HomePageState extends State<HomePage> {
   // void start() => );
   void listen() {
     _speech.listen(locale: "pt_BR").then((speaking) {
-      setState(() {
-        result = speaking;
-      });
+      // setState(() {
+      //    = speaking;
+      // });
     });
   }
 
@@ -75,11 +90,10 @@ class _HomePageState extends State<HomePage> {
 
   void onRecognitionStarted() => setState(() => _isListening = true);
 
-  void onRecognitionResult(String text) {
+  void onRecognitionResult(String t) {
+    print('onRecognitionResult');
     setState(() {
-      isListening = false;
-      respostas[currentIndex] = text;
-      currentIndex++;
+      text = t;
     });
   }
 
@@ -89,10 +103,37 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void onRecognitionComplete() => setState(() => _isListening = false);
+  void onRecognitionComplete() {
+    print('onRecognitionComplete');
+    print('text=' + text);
+    if (text.length > 0) {
+      setState(() {
+        _isListening = false;
+        startListening = false;
+      });
+      print('text RECEIVED!');
+      print(text.toString().length);
+      if (!isListening) {
+        if (currentIndex == 0) {
+          setName(text);
+        } else if (currentIndex == 2) {
+          if (text == "sim") {
+            escolherEspecialista = true;
+          }
+        }
+        setState(() {
+          isListening = false;
+          respostas[currentIndex] = text;
+          currentIndex++;
+        });
+        activateSpeechRecognizer();
+      }
+    }
+  }
+
 // Platform messages are asynchronous, so we initialize in an async method.
   void activateSpeechRecognizer() {
-    print('_MyAppState.activateSpeechRecognizer... ');
+    // print('_MyAppState.activateSpeechRecognizer... ');
     _speech = new SpeechRecognition();
     _speech.setRecognitionStartedHandler(onRecognitionStarted);
     _speech.setRecognitionResultHandler(onRecognitionResult);
@@ -109,6 +150,14 @@ class _HomePageState extends State<HomePage> {
     //   await _speak("Olá, poderia me dizer seu nome:");
     // });
     activateSpeechRecognizer();
+    flutterTts.completionHandler = whenComplete;
+  }
+
+  void whenComplete() {
+    // setState(() {
+    //   startListening = true;
+    // });
+    listen();
   }
 
   Future<bool> perguntar(msg) async {
@@ -117,22 +166,68 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    var content = NamePage();
+    print('index');
+    print(currentIndex);
+    Widget content = NamePage(
+      text: text,
+      perguntar: _speak,
+      isListening: isListening,
+      listen: listen,
+      setName: setName,
+    );
     if (currentIndex == 1) {
-      content = NamePage();
+      content = IdadePage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+        name: nome,
+      );
     } else if (currentIndex == 2) {
-      content = NamePage();
+      content = EspecialistaPage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+        name: nome,
+      );
+    } else if (currentIndex == 3) {
+      if (escolherEspecialista) {
+        content = EscolherEspecialista(
+          text: text,
+          perguntar: _speak,
+          isListening: isListening,
+          listen: listen,
+          setName: setName,
+          name: nome,
+        );
+      } else {
+        content = SentimentosPage(
+          text: text,
+          perguntar: _speak,
+          isListening: isListening,
+          listen: listen,
+          setName: setName,
+          name: nome,
+        );
+      }
+    } else if (currentIndex == 4) {
+      content = SentimentosPage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+        name: nome,
+      );
     }
     return Scaffold(
       // appBar: AppBar(
       //   title: Text(isListening ? 'Ouvindo...' : 'Falando...'),
       // ),
       body: content,
-      floatingActionButton: FloatingActionButton(onPressed: () async {
-        // await _speak(
-        //     "Olá Reginaldo, tudo bem com você? Sou a Sua atendente, por favor me informe seu problema");
-        start();
-      }),
     );
   }
 }

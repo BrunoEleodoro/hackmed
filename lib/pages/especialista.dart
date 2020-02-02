@@ -1,33 +1,39 @@
 import 'package:flutter/material.dart';
 
-class NamePage extends StatefulWidget {
+class EspecialistaPage extends StatefulWidget {
   var text = "";
   var perguntar;
   var textoFalado;
   var isListening = false;
   var listen;
   var setName;
+  var name;
   var startListening;
-  NamePage(
+  EspecialistaPage(
       {this.text,
       this.perguntar,
       this.textoFalado,
       this.isListening,
       this.listen,
       this.setName,
+      this.name,
       this.startListening});
   @override
-  _NamePageState createState() => _NamePageState();
+  _EspecialistaPageState createState() => _EspecialistaPageState();
 }
 
-class _NamePageState extends State<NamePage> {
-  var pergunta = 'Olá, tudo bem? Qual seu primeiro nome?';
+class _EspecialistaPageState extends State<EspecialistaPage> {
+  var pergunta = '';
 
   @override
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
-      print('perguntar');
+      setState(() {
+        pergunta = 'Então ' +
+            widget.name +
+            ', você ja sabe o especialista que voce precisa?';
+      });
       try {
         await widget.perguntar(pergunta);
       } catch (ex) {}
