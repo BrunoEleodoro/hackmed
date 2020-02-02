@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
-class EscolherEspecialista extends StatefulWidget {
+class AguardarPage extends StatefulWidget {
   var text = "";
   var perguntar;
   var textoFalado;
@@ -9,7 +10,7 @@ class EscolherEspecialista extends StatefulWidget {
   var setName;
   var name;
   var startListening;
-  EscolherEspecialista(
+  AguardarPage(
       {this.text,
       this.perguntar,
       this.textoFalado,
@@ -19,23 +20,15 @@ class EscolherEspecialista extends StatefulWidget {
       this.name,
       this.startListening});
   @override
-  _EscolherEspecialistaState createState() => _EscolherEspecialistaState();
+  _AguardarPageState createState() => _AguardarPageState();
 }
 
-class _EscolherEspecialistaState extends State<EscolherEspecialista> {
+class _AguardarPageState extends State<AguardarPage> {
   var pergunta = '';
 
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () async {
-      setState(() {
-        pergunta = 'Agora ' + widget.name + ', selecione o seu especialista';
-      });
-      try {
-        await widget.perguntar(pergunta, false);
-      } catch (ex) {}
-    });
   }
 
   @override
@@ -46,9 +39,11 @@ class _EscolherEspecialistaState extends State<EscolherEspecialista> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                pergunta,
+                'Aguarde...',
                 style: TextStyle(fontSize: 35, color: Colors.white),
                 textAlign: TextAlign.center,
               ),

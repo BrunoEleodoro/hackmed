@@ -1,10 +1,14 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:hackmed_app/pages/aguardar.dart';
 import 'package:hackmed_app/pages/escolher_especialista.dart';
 import 'package:hackmed_app/pages/especialista.dart';
 import 'package:hackmed_app/pages/idade.dart';
+import 'package:hackmed_app/pages/localizacao.dart';
 import 'package:hackmed_app/pages/name.dart';
 import 'package:hackmed_app/pages/sentimentos.dart';
 import 'package:speech_recognition/speech_recognition.dart';
@@ -53,8 +57,9 @@ class _HomePageState extends State<HomePage> {
   var text = "";
   var startListening = false;
   bool escolherEspecialista = false;
-
-  Future<bool> _speak(msg) async {
+  bool lastStep = false;
+  Future<bool> _speak(msg, lastStep2) async {
+    lastStep = lastStep2;
     Completer completer = new Completer<bool>();
     await flutterTts.setLanguage("pt-BR");
     print('call speak');
@@ -153,29 +158,51 @@ class _HomePageState extends State<HomePage> {
     flutterTts.completionHandler = whenComplete;
   }
 
-  void whenComplete() {
+  void whenComplete() async {
+    print('whenComplete');
     // setState(() {
     //   startListening = true;
     // });
-    listen();
+    if (lastStep) {
+      print('lastStep');
+      Position position = await Geolocator()
+          .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      var data = {
+        "nome": respostas[0],
+        "idade": respostas[1],
+        "especialista": respostas[2],
+        "sentimentos": respostas[3],
+        // "location": respostas[4]
+        "location":
+            position.latitude.toString() + "," + position.longitude.toString()
+      };
+      print(data);
+      // Response response = await Dio()
+      //     .post("http://brunoeleodoro.com:4000/atendimento/novo", data: data);
+      // print(response.data);
+    } else {
+      listen();
+    }
   }
 
   Future<bool> perguntar(msg) async {
-    return await _speak(msg);
+    return await _speak(msg, false);
   }
 
   @override
   Widget build(BuildContext context) {
     print('index');
     print(currentIndex);
-    Widget content = NamePage(
-      text: text,
-      perguntar: _speak,
-      isListening: isListening,
-      listen: listen,
-      setName: setName,
-    );
-    if (currentIndex == 1) {
+    Widget content;
+    if (currentIndex == 0) {
+      content = NamePage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+      );
+    } else if (currentIndex == 1) {
       content = IdadePage(
         text: text,
         perguntar: _speak,
@@ -215,6 +242,24 @@ class _HomePageState extends State<HomePage> {
       }
     } else if (currentIndex == 4) {
       content = SentimentosPage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+        name: nome,
+      );
+    } else if (currentIndex == 5) {
+      content = LocalizacaoPage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+        name: nome,
+      );
+    } else {
+      content = AguardarPage(
         text: text,
         perguntar: _speak,
         isListening: isListening,

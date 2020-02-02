@@ -29,8 +29,10 @@ class _NamePageState extends State<NamePage> {
     Future.delayed(Duration.zero, () async {
       print('perguntar');
       try {
-        await widget.perguntar(pergunta);
-      } catch (ex) {}
+        await widget.perguntar(pergunta, false);
+      } catch (ex) {
+        print(ex);
+      }
     });
   }
 

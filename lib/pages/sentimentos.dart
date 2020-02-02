@@ -30,12 +30,12 @@ class _SentimentosPageState extends State<SentimentosPage> {
     super.initState();
     Future.delayed(Duration.zero, () async {
       setState(() {
-        pergunta = 'Ahh está bem, vou registrar aqui' +
+        pergunta = 'Ahh está bem, vou registrar aqui ' +
             widget.name +
-            ', me diga o que você está sentindo';
+            ', Agora me diga o que você está sentindo';
       });
       try {
-        await widget.perguntar(pergunta);
+        await widget.perguntar(pergunta, false);
       } catch (ex) {}
     });
   }
@@ -48,6 +48,8 @@ class _SentimentosPageState extends State<SentimentosPage> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
                 pergunta,

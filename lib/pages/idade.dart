@@ -33,7 +33,7 @@ class _IdadePageState extends State<IdadePage> {
         pergunta = widget.name + ', qual a sua idade?';
       });
       try {
-        await widget.perguntar(pergunta);
+        await widget.perguntar(pergunta, false);
       } catch (ex) {}
     });
   }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
-class EscolherEspecialista extends StatefulWidget {
+class LocalizacaoPage extends StatefulWidget {
   var text = "";
   var perguntar;
   var textoFalado;
@@ -9,7 +10,7 @@ class EscolherEspecialista extends StatefulWidget {
   var setName;
   var name;
   var startListening;
-  EscolherEspecialista(
+  LocalizacaoPage(
       {this.text,
       this.perguntar,
       this.textoFalado,
@@ -19,10 +20,10 @@ class EscolherEspecialista extends StatefulWidget {
       this.name,
       this.startListening});
   @override
-  _EscolherEspecialistaState createState() => _EscolherEspecialistaState();
+  _LocalizacaoPageState createState() => _LocalizacaoPageState();
 }
 
-class _EscolherEspecialistaState extends State<EscolherEspecialista> {
+class _LocalizacaoPageState extends State<LocalizacaoPage> {
   var pergunta = '';
 
   @override
@@ -30,10 +31,11 @@ class _EscolherEspecialistaState extends State<EscolherEspecialista> {
     super.initState();
     Future.delayed(Duration.zero, () async {
       setState(() {
-        pergunta = 'Agora ' + widget.name + ', selecione o seu especialista';
+        pergunta = widget.name +
+            ', Preciso saber onde você está, vou precisar do acesso ao seu GPS ';
       });
       try {
-        await widget.perguntar(pergunta, false);
+        await widget.perguntar(pergunta, true);
       } catch (ex) {}
     });
   }
@@ -46,6 +48,8 @@ class _EscolherEspecialistaState extends State<EscolherEspecialista> {
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
                 pergunta,

@@ -35,7 +35,7 @@ class _EspecialistaPageState extends State<EspecialistaPage> {
             ', você ja sabe o especialista que voce precisa?';
       });
       try {
-        await widget.perguntar(pergunta);
+        await widget.perguntar(pergunta, false);
       } catch (ex) {}
     });
   }
