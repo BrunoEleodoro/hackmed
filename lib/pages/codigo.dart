@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
-class AguardarPage extends StatefulWidget {
+class CodigoPage extends StatefulWidget {
   var text = "";
   var perguntar;
   var textoFalado;
@@ -9,8 +9,9 @@ class AguardarPage extends StatefulWidget {
   var listen;
   var setName;
   var name;
+  var codigo;
   var startListening;
-  AguardarPage(
+  CodigoPage(
       {this.text,
       this.perguntar,
       this.textoFalado,
@@ -18,17 +19,28 @@ class AguardarPage extends StatefulWidget {
       this.listen,
       this.setName,
       this.name,
-      this.startListening});
+      this.startListening,
+      this.codigo});
   @override
-  _AguardarPageState createState() => _AguardarPageState();
+  _CodigoPageState createState() => _CodigoPageState();
 }
 
-class _AguardarPageState extends State<AguardarPage> {
+class _CodigoPageState extends State<CodigoPage> {
   var pergunta = '';
 
   @override
   void initState() {
     super.initState();
+    Future.delayed(Duration.zero, () async {
+      setState(() {
+        pergunta = 'Atenção ' +
+            widget.name +
+            ', Aqui está o código para confirmar seu atendimento com o médico, ele vai pedir assim que finalizar a consulta.';
+      });
+      try {
+        await widget.perguntar(pergunta, true);
+      } catch (ex) {}
+    });
   }
 
   @override
@@ -43,13 +55,18 @@ class _AguardarPageState extends State<AguardarPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Text(
-                'Aguarde...',
-                style: TextStyle(fontSize: 35, color: Colors.white),
+                pergunta,
+                style: TextStyle(fontSize: 30, color: Colors.white),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
                 height: 30,
               ),
+              Text(
+                widget.codigo,
+                style: TextStyle(fontSize: 30, color: Colors.white),
+                textAlign: TextAlign.center,
+              )
             ],
           ),
         ),

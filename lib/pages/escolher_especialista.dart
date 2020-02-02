@@ -41,7 +41,7 @@ class _EscolherEspecialistaState extends State<EscolherEspecialista> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.blue,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

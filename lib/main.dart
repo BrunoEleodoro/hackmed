@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:hackmed_app/pages/aguardar.dart';
+import 'package:hackmed_app/pages/codigo.dart';
 import 'package:hackmed_app/pages/escolher_especialista.dart';
 import 'package:hackmed_app/pages/especialista.dart';
 import 'package:hackmed_app/pages/idade.dart';
@@ -27,12 +28,12 @@ class MyApp extends StatelessWidget {
         //
         // Try running your application with "flutter run". You'll see the
         // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
+        // changing the primarySwatch below to Colors.blue and then invoke
         // "hot reload" (press "r" in the console where you ran "flutter run",
         // or simply save your changes to "hot reload" in a Flutter IDE).
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
-        primarySwatch: Colors.green,
+        primarySwatch: Colors.blue,
       ),
       home: HomePage(),
     );
@@ -55,6 +56,7 @@ class _HomePageState extends State<HomePage> {
   Map respostas = new Map();
   var result = "";
   var text = "";
+  var codigo = "";
   var startListening = false;
   bool escolherEspecialista = false;
   bool lastStep = false;
@@ -165,6 +167,7 @@ class _HomePageState extends State<HomePage> {
     // });
     if (lastStep) {
       print('lastStep');
+      await Geolocator().checkGeolocationPermissionStatus();
       Position position = await Geolocator()
           .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
       var data = {
@@ -176,10 +179,14 @@ class _HomePageState extends State<HomePage> {
         "location":
             position.latitude.toString() + "," + position.longitude.toString()
       };
-      print(data);
-      // Response response = await Dio()
-      //     .post("http://brunoeleodoro.com:4000/atendimento/novo", data: data);
-      // print(response.data);
+      Response response = await Dio()
+          .post("http://brunoeleodoro.com:4000/atendimento/novo", data: data);
+      print(response.data);
+
+      setState(() {
+        codigo = response.data['codigo'].toString();
+        currentIndex++;
+      });
     } else {
       listen();
     }
@@ -258,7 +265,7 @@ class _HomePageState extends State<HomePage> {
         setName: setName,
         name: nome,
       );
-    } else {
+    } else if (currentIndex == 6) {
       content = AguardarPage(
         text: text,
         perguntar: _speak,
@@ -266,6 +273,16 @@ class _HomePageState extends State<HomePage> {
         listen: listen,
         setName: setName,
         name: nome,
+      );
+    } else if (currentIndex == 7) {
+      content = CodigoPage(
+        text: text,
+        perguntar: _speak,
+        isListening: isListening,
+        listen: listen,
+        setName: setName,
+        name: nome,
+        codigo: codigo,
       );
     }
     return Scaffold(

@@ -32,7 +32,7 @@ class _EspecialistaPageState extends State<EspecialistaPage> {
       setState(() {
         pergunta = 'Então ' +
             widget.name +
-            ', você ja sabe o especialista que voce precisa?';
+            ', você já sabe o especialista que precisa?';
       });
       try {
         await widget.perguntar(pergunta, false);
@@ -43,7 +43,7 @@ class _EspecialistaPageState extends State<EspecialistaPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.green,
+      backgroundColor: Colors.blue,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
